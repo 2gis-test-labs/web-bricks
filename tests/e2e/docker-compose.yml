@@ -1,0 +1,23 @@
+services:
+  test-app:
+    build: build/.
+    ports:
+      - 80
+    expose:
+      - 80
+
+  chrome:
+    image: selenium/standalone-chrome-debug:3.141.59
+    restart: always
+    ports:
+      - 4444
+    environment:
+      - SCREEN_WIDTH=${SCREEN_WIDTH:-1920}
+      - SCREEN_HEIGHT=${SCREEN_HEIGHT:-1080}
+
+  e2e:
+    image: docker-hub.2gis.ru/ugc/e2e-python:3.8-alpine
+    build: .
+    volumes:
+      - ./scenarios:/home/ubuntu/workdir
+

@@ -1,0 +1,2 @@
+jj
+git+https://gitlab.2gis.ru/pychapter/mocked-response@v0.1.6#egg=mocked-response

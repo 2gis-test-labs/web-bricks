@@ -1,0 +1,5 @@
+jj
+pytest
+git+https://gitlab.2gis.ru/pychapter/mocked-response@v0.1.6#egg=mocked-response
+git+https://gitlab.2gis.ru/webdev/web-bricks.git@v0.0.2#egg=web-bricks
+selenium
