@@ -4,7 +4,7 @@ from rtry import retry
 
 from .index_locator import IndexLocator
 from .resolve_result import ResolveResult
-from .resolver import index_resolver
+
 from .web_bricks_config import WebBricksConfig
 
 
@@ -143,10 +143,6 @@ class WebBrick:
         return self.__class__(
             parent_element=self,
             locator=IndexLocator(item),
-            driver_func='index',
-            resolver=index_resolver(
-                self.__class__, self.get_root_config().logger, self.get_root_config().resolution_log_error
-            )
         )
 
     def __iter__(self):
