@@ -2,9 +2,9 @@ from typing import List
 
 from rtry import retry
 
+from . import ResolverInputSet
 from .index_locator import IndexLocator
 from .resolve_result import ResolveResult
-
 from .web_bricks_config import WebBricksConfig
 
 
@@ -82,8 +82,21 @@ class WebBrick:
     @property
     def _resolved_current(self):
         parent_element = self._resolved_parent
-        resolver = self._resolver if self._resolver else self.get_root_config().resolver
-        return resolver(parent_element, self._locator, self._driver_resolve_func_name)
+        resolver = self.get_root_config().resolver
+        return resolver(
+            ResolverInputSet(
+                parent_element,
+                self.root_brick().driver,
+                self._locator,
+                self.locator_full_str_path(),
+                self._driver_resolve_func_name,
+                self._logger
+            )
+        )
+
+    # def _res_at_once(self):
+    #     resolver = self.get_root_config().resolver
+    #     return resolver(self.root_brick().driver, self.locator_full_str_path(), self._driver_resolve_func_name)
 
     @property  # type: ignore
     @retry(attempts=3, until=lambda x: x is None, swallow=AssertionError)

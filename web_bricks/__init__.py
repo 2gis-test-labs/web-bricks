@@ -1,3 +1,4 @@
+from .resolver_interface import ResolverInputSet
 from .component import WebBrick
 from .resolve_result import ResolveResult
 from .resolver import web_resolver
