@@ -36,3 +36,7 @@ test-all:
 	$(MAKE) test-imports
 	$(MAKE) test-unit
 	$(MAKE) test-coverage
+
+.PHONY: dev-install
+dev-install:
+	python3 -m pip install .
