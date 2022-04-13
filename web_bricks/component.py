@@ -82,21 +82,17 @@ class WebBrick:
     @property
     def _resolved_current(self):
         parent_element = self._resolved_parent
-        resolver = self.get_root_config().resolver
+        resolver = self._resolver if self._resolver else self.get_root_config().resolver
         return resolver(
             ResolverInputSet(
-                parent_element,
-                self.root_brick().driver,
-                self._locator,
-                self.locator_full_str_path(),
-                self._driver_resolve_func_name,
-                self._logger
+                parent=parent_element,
+                driver=self.root_brick().driver,
+                locator=self._locator,
+                full_locator=self.locator_full_str_path(),
+                strategy=self._driver_resolve_func_name,
+                logger=self._logger
             )
         )
-
-    # def _res_at_once(self):
-    #     resolver = self.get_root_config().resolver
-    #     return resolver(self.root_brick().driver, self.locator_full_str_path(), self._driver_resolve_func_name)
 
     @property  # type: ignore
     @retry(attempts=3, until=lambda x: x is None, swallow=AssertionError)

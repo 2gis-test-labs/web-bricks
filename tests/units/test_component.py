@@ -3,7 +3,7 @@ from functools import reduce
 import pytest
 from selenium.webdriver.support.wait import WebDriverWait
 
-from web_bricks import ResolveResult, WebBrick
+from web_bricks import ResolveResult, WebBrick, ResolverInputSet
 from web_bricks.component import SafetyUsageError
 from web_bricks.index_locator import IndexLocator
 from web_bricks.resolver import web_resolver
@@ -126,7 +126,10 @@ class LogResolver:
         self.log = []
         self.value = value
 
-    def resolve(self, driver, locator, strategy):
+    def resolve(self, resolver_input_set: ResolverInputSet):
+        driver = resolver_input_set.parent
+        locator = resolver_input_set.locator
+        strategy = resolver_input_set.strategy
         self.log += [(driver, locator, strategy)]
         return self.value
 

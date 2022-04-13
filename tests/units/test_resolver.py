@@ -3,7 +3,7 @@ from typing import Iterator
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.support.wait import WebDriverWait
 
-from web_bricks import ResolveResult, web_resolver
+from web_bricks import ResolveResult, web_resolver, ResolverInputSet
 
 web_driver_resolver = web_resolver(waiter=WebDriverWait, ignored_exceptions=(TimeoutException,), timeout=3)
 
@@ -40,7 +40,7 @@ def test_resolve_one():
     findable = 'gotcha'
     driver = LogDriver(get_element_result=findable)
     locator = {'by': 'css', 'value': 'any'}
-    assert web_driver_resolver(driver, locator, ResolveResult.ONE) == findable
+    assert web_driver_resolver(ResolverInputSet(parent=driver, locator=locator, strategy=ResolveResult.ONE)) == findable
     assert driver.log == [(FUNC_NAME_1, locator['by'], locator['value'])]
 
 
@@ -48,14 +48,14 @@ def test_retry_resolve_one():
     findable = 'gotcha'
     driver = LogDriver(get_element_result=seq_gen([None, findable]))
     locator = {'by': 'css', 'value': 'any'}
-    assert web_driver_resolver(driver, locator, ResolveResult.ONE) == findable
+    assert web_driver_resolver(ResolverInputSet(parent=driver, locator=locator, strategy=ResolveResult.ONE)) == findable
     assert driver.log == [(FUNC_NAME_1, locator['by'], locator['value'])] * 2
 
 
 def test_retry_exhausted_resolve_one():
     driver = LogDriver(get_element_result=seq_gen([None] * 100))
     locator = {'by': 'css', 'value': 'any'}
-    assert web_driver_resolver(driver, locator, ResolveResult.ONE) == None  # noqa: E711
+    assert web_driver_resolver(ResolverInputSet(parent=driver, locator=locator, strategy=ResolveResult.ONE)) == None  # noqa: E711
     assert (FUNC_NAME_1, locator['by'], locator['value']) in driver.log
     assert len(driver.log) > 2
 
@@ -64,5 +64,5 @@ def test_resolve_many():
     findable = 'gotcha'
     driver = LogDriver(get_elements_result=findable)
     locator = {'by': 'css', 'value': 'any'}
-    assert web_driver_resolver(driver, locator, ResolveResult.MANY) == findable
+    assert web_driver_resolver(ResolverInputSet(parent=driver, locator=locator, strategy=ResolveResult.MANY)) == findable
     assert driver.log == [(FUNC_NAME_2, locator['by'], locator['value'])]
