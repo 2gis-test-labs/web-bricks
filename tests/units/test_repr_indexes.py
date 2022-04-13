@@ -1,6 +1,6 @@
 from functools import reduce
 
-from web_bricks import WebBricksConfig, WebBrick, ResolverInputSet, many
+from web_bricks import ResolverInputSet, WebBrick, WebBricksConfig, many
 from web_bricks.component import IndexLocator
 
 
@@ -40,8 +40,8 @@ def test_one_type_locators_to_xpath():
     brick = WebBrick(driver, {'xpath': ''}, config=conf)
     sub_brick = WebBrick(brick, {'xpath': '//*[@data-n="wat-search-results-list"]'})
     sub_sub_brick = many(WebBrick(sub_brick, {'xpath': '//*[@data-n="wat-minicard"]'}))[1]
-    assert repr(sub_sub_brick) == '''WebBrick('(//*[@data-n="wat-search-results-list"]//*[@data-n="wat-minicard"])[1]')'''
-
+    assert repr(sub_sub_brick) \
+           == '''WebBrick('(//*[@data-n="wat-search-results-list"]//*[@data-n="wat-minicard"])[1]')'''
 
 
 def another_locator_func(path):

@@ -2,9 +2,9 @@ from typing import List
 
 from rtry import retry
 
-from . import ResolverInputSet
 from .index_locator import IndexLocator
 from .resolve_result import ResolveResult
+from .resolver_interface import ResolverInputSet
 from .web_bricks_config import WebBricksConfig
 
 

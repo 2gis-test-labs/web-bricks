@@ -3,7 +3,7 @@ from functools import reduce
 import pytest
 from selenium.webdriver.support.wait import WebDriverWait
 
-from web_bricks import ResolveResult, WebBrick, ResolverInputSet
+from web_bricks import ResolveResult, ResolverInputSet, WebBrick
 from web_bricks.component import SafetyUsageError
 from web_bricks.index_locator import IndexLocator
 from web_bricks.resolver import web_resolver

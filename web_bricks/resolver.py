@@ -1,9 +1,7 @@
-from typing import Union
-
-from . import ResolverInputSet
 from .acesss_logger import ResolutionErrorLog, stdout_logger
 from .index_locator import IndexLocator
 from .resolve_result import ResolveResult
+from .resolver_interface import ResolverInputSet
 
 
 class NonexistingException(BaseException):

@@ -1,7 +1,8 @@
 from functools import reduce
 from typing import Iterator
 
-from web_bricks import WebBricksConfig, WebBrick, ResolverInputSet, ResolveResult, many
+from web_bricks import (ResolveResult, ResolverInputSet, WebBrick,
+                        WebBricksConfig, many)
 from web_bricks.component import IndexLocator
 
 
@@ -47,7 +48,7 @@ def resolver(resolver_input_set: ResolverInputSet):
     elm = None
     try:
         elm = getattr(resolver_input_set.driver, func)(resolver_input_set.full_locator)
-    except:
+    except:  # noqa
         pass
     return elm
 
@@ -64,6 +65,7 @@ def locator_func(path):
 
     return reduce(reducer, path, None)
 
+
 # TODO наименование
 def test_one_type_locators_to_xpath():
     conf = WebBricksConfig(
@@ -78,6 +80,7 @@ def test_one_type_locators_to_xpath():
     sub_brick = WebBrick(brick, {'xpath': '//*[@data-n="wat-search-results-list"]'})
     sub_sub_brick = WebBrick(sub_brick, {'xpath': '//*[@data-n="wat-minicard"]'})
     assert sub_sub_brick.resolved_element == res
+
 
 # TODO наименование
 def test_many_indexed_type_locators_to_xpath_to_one_resolved():
@@ -96,6 +99,7 @@ def test_many_indexed_type_locators_to_xpath_to_one_resolved():
     sub_brick = WebBrick(brick, {'xpath': '//*[@data-n="wat-search-results-list"]'})
     sub_sub_brick = many(WebBrick(sub_brick, {'xpath': '//*[@data-n="wat-minicard"]'}))[0]
     assert sub_sub_brick.resolved_element == res
+
 
 # TODO наименование
 def test_many_type_locators_to_xpath_to_array_resolved():
