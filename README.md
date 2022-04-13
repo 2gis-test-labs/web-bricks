@@ -1,22 +1,17 @@
-# web-bricks
+# Web-Bricks
 
-## install
+## Install
 
 ```bash
-python3 -m pip install git@github.com:2gis-test-labs/web-bricks.git
-```
-
-or
-
-```bash 
-cat 'git@github.com:2gis-test-labs/web-bricks.git@v0.0.3#egg=web-bricks' >> requirements.txt
+python3 -m pip install web-bricks
 ```
 
 ## Usage
 
 ```python
-from web_bricks import WebBricksConfig, web_resolver, WebBrick, many
+from web_bricks import WebBricksConfig, web_resolver, WebBrick, many, checkable
 from typing import List
+
 
 # at PageObject:
 
@@ -25,15 +20,26 @@ def make_locator(val):
     return {'by': 'css', 'value': val}
 
 
-class SubElement(WebBrick):
+class WebElement(WebBrick):
+    def click(self):
+        return checkable(self).click().apply()
+    
+    def get_text(self):
+        return checkable(self).text  # driver method
+    
+    def text(self):
+        return self.get_text().apply()
+
+
+class SubElement(WebElement):
     pass
 
 
-class MoreSubElement(WebBrick):
+class MoreSubElement(WebElement):
     pass
 
 
-class RootPage(WebBrick):
+class RootPage(WebElement):
     @property
     def sub_page(self) -> SubElement:
         locator = make_locator('some')
@@ -58,15 +64,15 @@ root_page.sub_elements[1].resolved_element.click()
 root_page.sub_elements[1].resolved_element.text
 ```
 
-## Прогнать тесты
+# Development
+
+## Tests
 
 ```bash
-python3 -m pip install -r requiremnts.txt
-python3 -m pip install -r requiremnts-dev.txt
-pytest tests
+make test-all
 ```
 
-## Установить библиотеку локально-
+## Local dev
 ```bash
-python3 -m pip install .
+make dev-install
 ```
