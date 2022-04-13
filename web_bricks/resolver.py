@@ -1,4 +1,5 @@
 from .acesss_logger import ResolutionErrorLog, stdout_logger
+from .index_locator import IndexLocator
 from .resolve_result import ResolveResult
 
 
@@ -31,8 +32,8 @@ def web_resolver(waiter, ignored_exceptions=None, timeout=None, logger=stdout_lo
 
 
 def index_resolver(element_type, logger=stdout_logger, log_action=ResolutionErrorLog):
-    def index_resolver(elements, locator, driver_resolve_func) -> element_type:
-        index = int(locator['value'])
+    def index_resolver(elements, locator: IndexLocator, driver_resolve_func) -> element_type:
+        index = locator.index
         element = None
         try:
             element = elements[index]

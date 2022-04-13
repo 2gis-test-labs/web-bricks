@@ -1,14 +1,34 @@
+from functools import reduce
+
 import pytest
 from selenium.webdriver.support.wait import WebDriverWait
 
 from web_bricks import ResolveResult, WebBrick
 from web_bricks.component import SafetyUsageError
+from web_bricks.index_locator import IndexLocator
 from web_bricks.resolver import web_resolver
 from web_bricks.web_bricks_config import WebBricksConfig
 
+
+def another_locator_func(path):
+    print('p', path)
+
+    def reducer(full_path, locator):
+        print('red', full_path, locator)
+        if full_path is None:
+            return f'{locator["value"]}'
+
+        if isinstance(locator, IndexLocator):
+            return f'{full_path} {locator.index}'
+
+        return f'{full_path} {locator["value"]}'
+
+    return reduce(reducer, path, None)
+
+
 selenium_config = WebBricksConfig(
     resolver=web_resolver(waiter=WebDriverWait, timeout=1),
-    locator_repr_extractor=lambda x: x['value'],
+    locator_repr_extractor=another_locator_func,
 )
 
 

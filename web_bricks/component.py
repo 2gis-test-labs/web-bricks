@@ -2,6 +2,7 @@ from typing import List
 
 from rtry import retry
 
+from .index_locator import IndexLocator
 from .resolve_result import ResolveResult
 from .resolver import index_resolver
 from .web_bricks_config import WebBricksConfig
@@ -45,6 +46,9 @@ class WebBrick:
             self._locator_full_path_cache = self._full_path()
         return self._locator_full_path_cache
 
+    def locator_full_str_path(self):
+        return self.get_root_config().locator_repr_extractor(self.locator_full_path)
+
     def _parent_class_path(self) -> list:
         if isinstance(self.parent_element, WebBrick):
             return self.parent_element._class_full_path()
@@ -61,10 +65,10 @@ class WebBrick:
 
     def __repr__(self):
         class_full_path = self.get_root_config().class_name_repr_func(self)
-        locator_full_path = map(self.get_root_config().locator_repr_extractor, self.locator_full_path)
+        locator_full_path = self.locator_full_str_path()
 
         many = '[]' if self._driver_resolve_func_name == ResolveResult.MANY else ''
-        return f"{class_full_path}{many}('{' '.join(locator_full_path)}')"
+        return f"{class_full_path}{many}('{locator_full_path}')"
 
     @property
     def _resolved_parent(self):
@@ -138,7 +142,7 @@ class WebBrick:
 
         return self.__class__(
             parent_element=self,
-            locator={'by': 'index', 'value': str(item)},
+            locator=IndexLocator(item),
             driver_func='index',
             resolver=index_resolver(
                 self.__class__, self.get_root_config().logger, self.get_root_config().resolution_log_error
