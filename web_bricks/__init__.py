@@ -8,4 +8,5 @@ from .web_bricks_config import WebBricksConfig
 __all__ = (
     'WebBrick', 'WebBricksConfig', 'web_resolver', 'ResolveResult', 'many', 'checkable', 'ResolverInputSet'
 )
-__version__ = "0.0.3"
+
+__version__ = "0.1.1"
