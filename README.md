@@ -64,6 +64,27 @@ root_page.sub_elements[1].resolved_element.click()
 root_page.sub_elements[1].resolved_element.text
 ```
 
+Для тсабильного выполнения без stale element
+```python
+TODO
+```
+
+Для полного разрешения
+```python
+TODO
+```
+
+Для каскадного разрешения элементов
+```python
+TODO
+```
+
+Свой резолвер
+```python
+TODO
+```
+
+TODO
 # Development
 
 ## Tests

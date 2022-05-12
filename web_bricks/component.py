@@ -4,7 +4,6 @@ from rtry import retry
 
 from .index_locator import IndexLocator
 from .resolve_result import ResolveResult
-from .resolver_interface import ResolverInputSet
 from .web_bricks_config import WebBricksConfig
 
 
@@ -17,41 +16,66 @@ class SafetyUsageError(BaseException):
 
 
 class WebBrick:
-    def __init__(self, parent_element, locator, driver_func=ResolveResult.ONE,
-                 config: WebBricksConfig = None, resolver=None, logger=None):
+    """
+    WebBrick - цепочечный локатор элемента
+
+    Props:
+        *driver* - объект web драйвера/браузера\n
+        *parent* - web_brick - родительский локатор элемента\n
+        *locator* - текущий локатор элемента\n
+        *full_locator* - массив локаторов элемента упорядоченные по вложенности\n
+        *full_locator_str* - строка полного локатора элемента
+        *strategy* - стратегия выборки элемента (например простая - один много)\n
+        *resolved* - свойство для вызова WebBricksConfig.resolver(self: WebBrick)\n
+    """
+
+    LOCATOR = None
+
+    def __init__(self, parent_element, locator=None, strategy=ResolveResult.ONE, config: WebBricksConfig = None):
         assert isinstance(parent_element, WebBrick) or config is not None, SafetyUsageError(
             f'Узел {self.__class__} прикрепляется не к дереву Component-ов, '
             f'а к драйверу parent_element={parent_element} '
             f'или забыли указать конфигурацию для корневого элемента в свойстве config={config}'
         )
-        self.parent_element = parent_element
-        self._locator = locator
-        self._resolver = resolver
-        self._driver_resolve_func_name = driver_func
+        self._parent_element = parent_element
+
+        self._locator = self.LOCATOR
+        if locator:
+            self._locator = locator
+
+        self._config = config
+        self._strategy = strategy
         self.session_id = 'WebBrick plug session_id'
-        self.config = config
-        self._logger = logger
 
     def _parent_path(self) -> list:
-        if isinstance(self.parent_element, WebBrick):
-            return self.parent_element._full_path()
+        if isinstance(self._parent_element, WebBrick):
+            return self._parent_element._full_path()
         return []
 
     def _full_path(self) -> list:
         return self._parent_path() + [self._locator]
 
     @property
-    def locator_full_path(self):
+    def strategy(self):
+        return self._strategy
+
+    @property
+    def locator(self):
+        return self._locator
+
+    @property
+    def full_locator(self):
         if not hasattr(self, '_locator_full_path_cache'):
             self._locator_full_path_cache = self._full_path()
         return self._locator_full_path_cache
 
-    def locator_full_str_path(self):
-        return self.get_root_config().locator_repr_extractor(self.locator_full_path)
+    @property
+    def full_locator_str(self):
+        return self.config.locator_repr_extractor(self.full_locator)
 
     def _parent_class_path(self) -> list:
-        if isinstance(self.parent_element, WebBrick):
-            return self.parent_element._class_full_path()
+        if isinstance(self._parent_element, WebBrick):
+            return self._parent_element._class_full_path()
         return []
 
     def _class_full_path(self) -> list:
@@ -59,80 +83,59 @@ class WebBrick:
 
     @property
     def class_full_path(self):
+        DeprecationWarning('class_full_path is deprecated')
         if not hasattr(self, '_class_full_path_cache'):
             self._class_full_path_cache = self._class_full_path()
         return self._class_full_path_cache
 
     def __repr__(self):
-        class_full_path = self.get_root_config().class_name_repr_func(self)
-        locator_full_path = self.locator_full_str_path()
+        class_full_path = self.config.class_name_repr_func(self)
+        locator_full_path = self.full_locator_str
 
-        many = '[]' if self._driver_resolve_func_name == ResolveResult.MANY else ''
+        many = '[]' if self._strategy == ResolveResult.MANY else ''
         return f"{class_full_path}{many}('{locator_full_path}')"
-
-    @property
-    def _resolved_parent(self):
-        parent_element = self.parent_element
-        if isinstance(self.parent_element, WebBrick):
-            parent_element = self.parent_element._resolved_current
-            assert parent_element is not None, \
-                f'Не найден родительский элемент {self.parent_element} для {self.__class__}:{self}'
-        return parent_element
-
-    @property
-    def _resolved_current(self):
-        parent_element = self._resolved_parent
-        resolver = self._resolver if self._resolver else self.get_root_config().resolver
-        return resolver(
-            ResolverInputSet(
-                parent=parent_element,
-                driver=self.root_brick().driver,
-                locator=self._locator,
-                full_locator=self.locator_full_str_path(),
-                strategy=self._driver_resolve_func_name,
-                logger=self._logger
-            )
-        )
 
     @property  # type: ignore
     @retry(attempts=3, until=lambda x: x is None, swallow=AssertionError)
     def resolved_element(self):
-        result = self._resolved_current
-        self.log(self.get_root_config().resolution_log(self, result))
-        if result is None and self._driver_resolve_func_name == ResolveResult.MANY:
-            result = []
-        return result
+        DeprecationWarning('resolved_element deprecated, use resolved instead')
+        return self.config.resolver(self)
 
-    def resolved_found_element(self, fail_msg='нет элемента на странице'):
-        result = self.resolved_element
-        assert (result is not None) and (result != []), f'Не нашли элемент {self}: {fail_msg}'
-        return result
+    @property
+    @retry(attempts=3, until=lambda x: x is None, swallow=AssertionError)
+    def resolved(self):
+        return self.config.resolver(self)
 
-    def root_brick(self) -> 'WebBrick':
-        parent_element = self.parent_element
+    def _root_brick(self) -> 'WebBrick':
+        parent_element = self._parent_element
         if not isinstance(parent_element, WebBrick):
             return self
-        return parent_element.root_brick()
+        return parent_element._root_brick()
 
-    def get_root_config(self) -> WebBricksConfig:
-        root_brick = self.root_brick()
-        root_brick_config = root_brick.config
+    @property
+    def config(self) -> WebBricksConfig:
+        root_brick = self._root_brick()
+        root_brick_config = root_brick._config
         assert root_brick_config is not None, SafetyUsageError(
             f'Корневой элемент {self.__class__} должен содержать '
-            f'конфиг с стратегией {root_brick.config} для поиска элементов'
+            f'конфиг с стратегией {root_brick._config} для поиска элементов'
         )
         # TODO cache config?
         return root_brick_config
 
-    def log(self, record):
-        self.get_root_config().logger(record)
+    def logger(self, record):
+        self.config.logger(record)
 
     @property
     def driver(self):
-        return self.root_brick().parent_element
+        return self._root_brick()._parent_element
+
+    @property
+    def parent(self):
+        return self._parent_element
 
     def __len__(self):
-        assert self._driver_resolve_func_name == ResolveResult.MANY, SafetyUsageError(
+        assert self._strategy == ResolveResult.MANY, SafetyUsageError(
             f'Попытка обратиться за длиной массива компонентов в {self.__class__}, '
             f'но в определении указан одиночный веб-элемент, '
             'возможно забыли добавить many? - many( WebBrick(...) )'
@@ -143,7 +146,7 @@ class WebBrick:
         return len(result)
 
     def __getitem__(self, item):
-        assert self._driver_resolve_func_name == ResolveResult.MANY, SafetyUsageError(
+        assert self._strategy == ResolveResult.MANY, SafetyUsageError(
             f'Попытка обратиться к элементу массива компонентов в {self.__class__}, '
             f'но в определении указан одиночный веб-элемент, '
             'возможно забыли добавить many? - many( WebBrick(...) )'
@@ -155,7 +158,7 @@ class WebBrick:
         )
 
     def __iter__(self):
-        assert self._driver_resolve_func_name == ResolveResult.MANY, SafetyUsageError(
+        assert self._strategy == ResolveResult.MANY, SafetyUsageError(
             f'Попытка итерировать элементы массива компонентов в {self.__class__}, '
             f'но в определении указан одиночный веб-элемент, '
             'возможно забыли добавить many? - many( WebBrick(...) )'
@@ -163,10 +166,10 @@ class WebBrick:
         return iter([self[idx] for idx in range(len(self))])
 
     def list(self) -> List:
-        self._driver_resolve_func_name = ResolveResult.MANY
+        self._strategy = ResolveResult.MANY
         return self  # type: ignore  # WebBrick реализует интерфейс List
 
-    def is_equal(self, other):
+    def _is_equal(self, other):
         if isinstance(other, WebBrick):
             assert repr(self) != repr(other), SafetyUsageError(
                 f'Сравнение описаний {self.__class__} не равносильно сравнению значений элементов. '
@@ -177,7 +180,7 @@ class WebBrick:
 
     def __eq__(self, other):
         # TODO стоит добавить __ne__, что бы корректно прокинуть not в проверки
-        return self.is_equal(other)
+        return self._is_equal(other)
 
     def __bool__(self):
         raise SafetyUsageError(

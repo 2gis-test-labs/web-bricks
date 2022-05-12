@@ -6,9 +6,13 @@ def _value_getter(x):
 
 
 class WebBricksConfig:
-    def __init__(self, resolver, locator_repr_extractor=None, logger=None,
+    def __init__(self, resolver=None, locator_repr_extractor=None, logger=None,
                  root_locator=None, resolution_log=None, resolution_log_error=None, class_name_repr_func=None):
+
+        if resolver is None:
+            resolver = lambda web_brick: web_brick
         self.resolver = resolver
+
         if root_locator is None:
             root_locator = {'by': 'css', 'value': ':root'}
         self.root_locator = root_locator
@@ -32,5 +36,6 @@ class WebBricksConfig:
         if class_name_repr_func is None:
             def only_name_class(x):
                 return x.__class__.__name__
+
             class_name_repr_func = only_name_class
         self.class_name_repr_func = class_name_repr_func

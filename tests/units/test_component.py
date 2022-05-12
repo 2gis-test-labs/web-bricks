@@ -137,7 +137,11 @@ class LogResolver:
 def test_no_action_resolution():
     locator = find_by_attr(name='some_locator')
     resolver = LogResolver()
-    WebBrick(None, locator, ResolveResult.ONE, config=selenium_config, resolver=resolver.resolve)
+    selenium_config = WebBricksConfig(
+        resolver=resolver.resolve,
+        locator_repr_extractor=another_locator_func,
+    )
+    WebBrick(None, locator, ResolveResult.ONE, config=selenium_config)
     assert resolver.log == []
 
 
@@ -145,7 +149,11 @@ def test_no_action_many_index():
     locator = find_by_attr(name='some_locator')
     driver = LogDriver()
     resolver = LogResolver()
-    WebBrick(driver, locator, ResolveResult.MANY, config=selenium_config, resolver=resolver.resolve)[0]
+    selenium_config = WebBricksConfig(
+        resolver=resolver.resolve,
+        locator_repr_extractor=another_locator_func,
+    )
+    WebBrick(driver, locator, ResolveResult.MANY, config=selenium_config)[0]
     assert resolver.log == []
 
 
@@ -153,7 +161,11 @@ def test_action_one_resolution():
     locator = find_by_attr(name='some_locator')
     driver = LogDriver()
     resolver = LogResolver()
-    WebBrick(driver, locator, ResolveResult.ONE, config=selenium_config, resolver=resolver.resolve).resolved_element
+    selenium_config = WebBricksConfig(
+        resolver=resolver.resolve,
+        locator_repr_extractor=another_locator_func,
+    )
+    WebBrick(driver, locator, ResolveResult.ONE, config=selenium_config).resolved_element
     assert resolver.log == [(driver, locator, ResolveResult.ONE)]
 
 
@@ -161,7 +173,11 @@ def test_action_one_resolution_none_result():
     locator = find_by_attr(name='some_locator')
     driver = LogDriver()
     resolver = LogResolver(None)
-    WebBrick(driver, locator, ResolveResult.ONE, config=selenium_config, resolver=resolver.resolve).resolved_element
+    selenium_config = WebBricksConfig(
+        resolver=resolver.resolve,
+        locator_repr_extractor=another_locator_func,
+    )
+    WebBrick(driver, locator, ResolveResult.ONE, config=selenium_config).resolved_element
     assert resolver.log == [(driver, locator, ResolveResult.ONE)] * 3
 
 
@@ -169,7 +185,11 @@ def test_action_many_resolution():
     locator = find_by_attr(name='some_locator')
     driver = LogDriver()
     resolver = LogResolver()
-    WebBrick(driver, locator, ResolveResult.MANY, config=selenium_config, resolver=resolver.resolve).resolved_element
+    selenium_config = WebBricksConfig(
+        resolver=resolver.resolve,
+        locator_repr_extractor=another_locator_func,
+    )
+    WebBrick(driver, locator, ResolveResult.MANY, config=selenium_config).resolved_element
     assert resolver.log == [(driver, locator, ResolveResult.MANY)]
 
 
@@ -177,8 +197,12 @@ def test_index_for_one():
     locator = find_by_attr(name='some_locator')
     driver = LogDriver()
     resolver = LogResolver()
+    selenium_config = WebBricksConfig(
+        resolver=resolver.resolve,
+        locator_repr_extractor=another_locator_func,
+    )
     with pytest.raises(AssertionError):
-        WebBrick(driver, locator, ResolveResult.ONE, config=selenium_config, resolver=resolver.resolve)[0]
+        WebBrick(driver, locator, ResolveResult.ONE, config=selenium_config)[0]
     assert resolver.log == []
 
 
@@ -186,8 +210,12 @@ def test_index_out_of_range_for_one():
     locator = find_by_attr(name='some_locator')
     driver = LogDriver()
     resolver = LogResolver()
+    selenium_config = WebBricksConfig(
+        resolver=resolver.resolve,
+        locator_repr_extractor=another_locator_func,
+    )
     with pytest.raises(AssertionError):
-        WebBrick(driver, locator, ResolveResult.ONE, config=selenium_config, resolver=resolver.resolve)[1000]
+        WebBrick(driver, locator, ResolveResult.ONE, config=selenium_config)[1000]
     assert resolver.log == []
 
 
@@ -195,8 +223,12 @@ def test_try_iter_for_one():
     locator = find_by_attr(name='some_locator')
     driver = LogDriver()
     resolver = LogResolver()
+    selenium_config = WebBricksConfig(
+        resolver=resolver.resolve,
+        locator_repr_extractor=another_locator_func,
+    )
     with pytest.raises(AssertionError):
-        for item in WebBrick(driver, locator, ResolveResult.ONE, config=selenium_config, resolver=resolver.resolve):
+        for item in WebBrick(driver, locator, ResolveResult.ONE, config=selenium_config):
             pass
     assert resolver.log == []
 
@@ -206,7 +238,11 @@ def test_equality_of_value():
     locator = find_by_attr(name='some_locator')
     driver = LogDriver()
     resolver = LogResolver(the_value)
-    component = WebBrick(driver, locator, ResolveResult.ONE, config=selenium_config, resolver=resolver.resolve)
+    selenium_config = WebBricksConfig(
+        resolver=resolver.resolve,
+        locator_repr_extractor=another_locator_func,
+    )
+    component = WebBrick(driver, locator, ResolveResult.ONE, config=selenium_config)
     assert (component == the_value) is True
     assert resolver.log == [(driver, locator, ResolveResult.ONE)]
 
@@ -216,7 +252,11 @@ def test_equality_of_value_of_none():
     locator = find_by_attr(name='some_locator')
     driver = LogDriver()
     resolver = LogResolver(the_none_value)
-    component = WebBrick(driver, locator, ResolveResult.ONE, config=selenium_config, resolver=resolver.resolve)
+    selenium_config = WebBricksConfig(
+        resolver=resolver.resolve,
+        locator_repr_extractor=another_locator_func,
+    )
+    component = WebBrick(driver, locator, ResolveResult.ONE, config=selenium_config)
     assert (component == the_none_value) is True
     assert len(resolver.log) > 2
 
@@ -226,7 +266,11 @@ def test_unequality_of_value_with_none():
     locator = find_by_attr(name='some_locator')
     driver = LogDriver()
     resolver = LogResolver(the_value)
-    component = WebBrick(driver, locator, ResolveResult.ONE, config=selenium_config, resolver=resolver.resolve)
+    selenium_config = WebBricksConfig(
+        resolver=resolver.resolve,
+        locator_repr_extractor=another_locator_func,
+    )
+    component = WebBrick(driver, locator, ResolveResult.ONE, config=selenium_config)
     assert (component != None) is True  # noqa: E711
     assert resolver.log == [(driver, locator, ResolveResult.ONE)]
 
@@ -236,7 +280,11 @@ def test_unequality_of_value_of_none_with_data():
     locator = find_by_attr(name='some_locator')
     driver = LogDriver()
     resolver = LogResolver(the_none_value)
-    component = WebBrick(driver, locator, ResolveResult.ONE, config=selenium_config, resolver=resolver.resolve)
+    selenium_config = WebBricksConfig(
+        resolver=resolver.resolve,
+        locator_repr_extractor=another_locator_func,
+    )
+    component = WebBrick(driver, locator, ResolveResult.ONE, config=selenium_config)
     assert (component != 'some value') is True
     assert len(resolver.log) > 2
 
@@ -245,7 +293,11 @@ def test_equality_of_same():
     locator = find_by_attr(name='some_locator')
     driver = LogDriver()
     resolver = LogResolver()
-    component = WebBrick(driver, locator, ResolveResult.ONE, config=selenium_config, resolver=resolver.resolve)
+    selenium_config = WebBricksConfig(
+        resolver=resolver.resolve,
+        locator_repr_extractor=another_locator_func,
+    )
+    component = WebBrick(driver, locator, ResolveResult.ONE, config=selenium_config)
     with pytest.raises(AssertionError):
         assert (component == component) is False
 
@@ -254,7 +306,11 @@ def test_non_equality_of_same():
     locator = find_by_attr(name='some_locator')
     driver = LogDriver()
     resolver = LogResolver()
-    component = WebBrick(driver, locator, ResolveResult.ONE, config=selenium_config, resolver=resolver.resolve)
+    selenium_config = WebBricksConfig(
+        resolver=resolver.resolve,
+        locator_repr_extractor=another_locator_func,
+    )
+    component = WebBrick(driver, locator, ResolveResult.ONE, config=selenium_config)
     with pytest.raises(AssertionError):
         assert (component != component) is False
 
@@ -265,13 +321,19 @@ def test_equality_of_different_web_bricks_same_value():
 
     locator = find_by_attr(name='some_locator')
     resolver = LogResolver(the_value)
-    component = WebBrick(driver, locator, ResolveResult.ONE, config=selenium_config, resolver=resolver.resolve)
+    selenium_config = WebBricksConfig(
+        resolver=resolver.resolve,
+        locator_repr_extractor=another_locator_func,
+    )
+    component = WebBrick(driver, locator, ResolveResult.ONE, config=selenium_config)
 
     another_locator = find_by_attr(name='another_locator')
     another_resolver = LogResolver(the_value)
-    another_component = WebBrick(
-        driver, another_locator, ResolveResult.ONE, config=selenium_config, resolver=another_resolver.resolve
+    another_selenium_config = WebBricksConfig(
+        resolver=another_resolver.resolve,
+        locator_repr_extractor=another_locator_func,
     )
+    another_component = WebBrick(driver, another_locator, ResolveResult.ONE, config=another_selenium_config)
     assert (component == another_component) is True
 
 
@@ -281,14 +343,20 @@ def test_equality_of_different_web_bricks_different_values():
     value = 'gotcha'
     locator = find_by_attr(name='some_locator')
     resolver = LogResolver(value)
-    component = WebBrick(driver, locator, ResolveResult.ONE, config=selenium_config, resolver=resolver.resolve)
+    selenium_config = WebBricksConfig(
+        resolver=resolver.resolve,
+        locator_repr_extractor=another_locator_func,
+    )
+    component = WebBrick(driver, locator, ResolveResult.ONE, config=selenium_config)
 
     another_value = 'achtog'
     another_locator = find_by_attr(name='another_locator')
     another_resolver = LogResolver(another_value)
-    another_component = WebBrick(
-        driver, another_locator, ResolveResult.ONE, config=selenium_config, resolver=another_resolver.resolve
+    another_selenium_config = WebBricksConfig(
+        resolver=another_resolver.resolve,
+        locator_repr_extractor=another_locator_func,
     )
+    another_component = WebBrick(driver, another_locator, ResolveResult.ONE, config=another_selenium_config)
     assert (component == another_component) is False
 
 
@@ -297,7 +365,11 @@ def test_assertion_on_component_with_value():
     locator = find_by_attr(name='some_locator')
     driver = LogDriver()
     resolver = LogResolver(the_value)
-    component = WebBrick(driver, locator, ResolveResult.ONE, config=selenium_config, resolver=resolver.resolve)
+    selenium_config = WebBricksConfig(
+        resolver=resolver.resolve,
+        locator_repr_extractor=another_locator_func,
+    )
+    component = WebBrick(driver, locator, ResolveResult.ONE, config=selenium_config)
     with pytest.raises(SafetyUsageError):
         assert component
     assert resolver.log == []
@@ -308,23 +380,23 @@ def test_assertion_on_component_with_none():
     locator = find_by_attr(name='some_locator')
     driver = LogDriver()
     resolver = LogResolver(the_none_value)
-    component = WebBrick(driver, locator, ResolveResult.ONE, config=selenium_config, resolver=resolver.resolve)
+    selenium_config = WebBricksConfig(
+        resolver=resolver.resolve,
+        locator_repr_extractor=another_locator_func,
+    )
+    component = WebBrick(driver, locator, ResolveResult.ONE, config=selenium_config)
     with pytest.raises(SafetyUsageError):
         assert component
     assert resolver.log == []
-
-
-def test_root_brick_for_one():
-    locator = find_by_attr(name='some_locator')
-    driver = LogDriver()
-    resolver = LogResolver()
-    brick = WebBrick(driver, locator, ResolveResult.ONE, config=selenium_config, resolver=resolver.resolve)
-    assert id(brick.root_brick()) == id(brick)
 
 
 def test_driver_for_one():
     locator = find_by_attr(name='some_locator')
     driver = LogDriver()
     resolver = LogResolver()
-    brick = WebBrick(driver, locator, ResolveResult.ONE, config=selenium_config, resolver=resolver.resolve)
+    selenium_config = WebBricksConfig(
+        resolver=resolver.resolve,
+        locator_repr_extractor=another_locator_func,
+    )
+    brick = WebBrick(driver, locator, ResolveResult.ONE, config=selenium_config)
     assert id(brick.driver) == id(driver)
