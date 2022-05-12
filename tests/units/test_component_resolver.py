@@ -1,10 +1,8 @@
 from typing import Iterator
 
 import pytest
-from selenium.common.exceptions import TimeoutException
-from selenium.webdriver.support.wait import WebDriverWait
 
-from web_bricks import ResolveResult, WebBrick, WebBricksConfig, web_resolver
+from web_bricks import ResolveResult, WebBrick, WebBricksConfig
 from web_bricks.chain_forward_resolver import chain_resolver
 
 selenium_config = WebBricksConfig(

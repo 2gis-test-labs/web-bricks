@@ -10,7 +10,10 @@ class WebBricksConfig:
                  root_locator=None, resolution_log=None, resolution_log_error=None, class_name_repr_func=None):
 
         if resolver is None:
-            resolver = lambda web_brick: web_brick
+            def as_is_resolver(web_brick):
+                return web_brick
+
+            resolver = as_is_resolver
         self.resolver = resolver
 
         if root_locator is None:

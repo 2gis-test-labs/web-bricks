@@ -1,10 +1,10 @@
 from functools import reduce
 
-from web_bricks import ResolverInputSet, WebBrick, WebBricksConfig, many
+from web_bricks import WebBrick, WebBricksConfig, many
 from web_bricks.component import IndexLocator
 
 
-def resolver(resolver_input_set: ResolverInputSet):
+def resolver(web_brick):
     pass
 
 

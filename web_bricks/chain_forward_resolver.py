@@ -15,7 +15,7 @@ def resolver(parent_element, locator, driver_resolve_func, logger, ignored_excep
     if isinstance(locator, IndexLocator):
         try:
             elm = parent_element[locator.index]
-        except IndexError as e:
+        except IndexError:
             pass
         return elm
 

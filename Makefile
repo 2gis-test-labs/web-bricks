@@ -39,7 +39,7 @@ test-style:
 test-all:
 	$(MAKE) test-style
 	$(MAKE) test-imports
-	$(MAKE) test-unit
+	$(MAKE) test-units
 	$(MAKE) test-coverage
 
 .PHONY: dev-install
