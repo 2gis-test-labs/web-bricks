@@ -4,15 +4,8 @@ from rtry import retry
 
 from .index_locator import IndexLocator
 from .resolve_result import ResolveResult
+from .safety_error import SafetyUsageError
 from .web_bricks_config import WebBricksConfig
-
-
-class SafetyUsageError(BaseException):
-    def __init__(self, msg):
-        self.msg = msg
-
-    def __str__(self):
-        return self.msg
 
 
 class WebBrick:

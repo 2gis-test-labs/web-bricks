@@ -1,4 +1,6 @@
 from .acesss_logger import ResolutionErrorLog, ResolutionLog, stdout_logger
+from .locator_extractor import default_str_locator_extractor
+from .safety_error import SafetyUsageError
 
 
 def _value_getter(x):
@@ -11,7 +13,9 @@ class WebBricksConfig:
 
         if resolver is None:
             def as_is_resolver(web_brick):
-                return web_brick
+                raise SafetyUsageError('WebBrick в данной конфигурации не умеет разрешать элементы автоматически\n'
+                                       'Добавьте кастомные действия для вашего драйвера или\n'
+                                       'Определите корректный resolver в WebBricksConfig')
 
             resolver = as_is_resolver
         self.resolver = resolver
@@ -21,7 +25,7 @@ class WebBricksConfig:
         self.root_locator = root_locator
 
         if locator_repr_extractor is None:
-            locator_repr_extractor = _value_getter
+            locator_repr_extractor = default_str_locator_extractor
         self.locator_repr_extractor = locator_repr_extractor
 
         if logger is None:
