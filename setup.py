@@ -8,7 +8,7 @@ TESTS_REQUIRE = (HERE / "requirements-dev.txt").read_text().splitlines()[1:]
 README, DEV_README = open("README.md").read().split('# Development')
 setup(
     name="web-bricks",
-    version="0.1.2",
+    version="0.1.3",
     description="Page Object constructor for UI automation",
     long_description=README,
     long_description_content_type="text/markdown",
