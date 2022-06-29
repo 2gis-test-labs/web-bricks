@@ -25,6 +25,11 @@ test-imports:
 	#python3 -m pip install -r requirements-dev.txt
 	python3 -m isort web_bricks tests --check-only
 
+.PHONY: fix-imports
+fix-imports:
+	#python3 -m pip install -r requirements-dev.txt
+	python3 -m isort web_bricks tests
+
 .PHONY: test-style
 test-style:
 	#python3 -m pip install -r requirements-dev.txt
@@ -34,7 +39,7 @@ test-style:
 test-all:
 	$(MAKE) test-style
 	$(MAKE) test-imports
-	$(MAKE) test-unit
+	$(MAKE) test-units
 	$(MAKE) test-coverage
 
 .PHONY: dev-install

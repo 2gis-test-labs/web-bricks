@@ -1,14 +1,13 @@
 from typing import Iterator
 
 import pytest
-from selenium.common.exceptions import TimeoutException
-from selenium.webdriver.support.wait import WebDriverWait
 
-from web_bricks import ResolveResult, WebBrick, WebBricksConfig, web_resolver
+from web_bricks import ResolveResult, WebBrick, WebBricksConfig
+from web_bricks.chain_forward_resolver import chain_resolver
 
 selenium_config = WebBricksConfig(
-    resolver=web_resolver(waiter=WebDriverWait, timeout=1, ignored_exceptions=TimeoutException),
-    locator_repr_extractor=lambda x: x['value'],
+    resolver=chain_resolver,
+    locator_repr_extractor=lambda x: ' '.join([str(item) for item in x])
 )
 
 FUNC_NAME_1 = 'find_element'

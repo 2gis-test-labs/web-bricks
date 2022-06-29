@@ -1,5 +1,7 @@
 from .acesss_logger import ResolutionErrorLog, stdout_logger
+from .index_locator import IndexLocator
 from .resolve_result import ResolveResult
+from .resolver_interface import ResolverInputSet
 
 
 class NonexistingException(BaseException):
@@ -10,7 +12,10 @@ def web_resolver(waiter, ignored_exceptions=None, timeout=None, logger=stdout_lo
     if ignored_exceptions is None:
         ignored_exceptions = NonexistingException
 
-    def resolver(parent_element, locator: dict, driver_resolve_func):
+    def resolver(resolution_input_set: ResolverInputSet):
+        parent_element = resolution_input_set.parent
+        locator = resolution_input_set.locator
+        driver_resolve_func = resolution_input_set.strategy
         assert timeout is not None, 'Не установлен таймаут для поиска элемента на странице'
 
         selenium_func = {
@@ -19,6 +24,13 @@ def web_resolver(waiter, ignored_exceptions=None, timeout=None, logger=stdout_lo
         }
 
         elm = None
+        if isinstance(locator, IndexLocator):
+            try:
+                elm = parent_element[locator.index]
+            except IndexError as e:
+                logger(log_action(parent_element, locator, e))
+            return elm
+
         try:
             wait = waiter(parent_element, timeout)
             elm = wait.until(lambda dr: object.__getattribute__(dr, selenium_func[driver_resolve_func])(**locator))
@@ -28,16 +40,3 @@ def web_resolver(waiter, ignored_exceptions=None, timeout=None, logger=stdout_lo
         return elm
 
     return resolver
-
-
-def index_resolver(element_type, logger=stdout_logger, log_action=ResolutionErrorLog):
-    def index_resolver(elements, locator, driver_resolve_func) -> element_type:
-        index = int(locator['value'])
-        element = None
-        try:
-            element = elements[index]
-        except IndexError as e:
-            logger(log_action(elements, locator, e))
-        return element
-
-    return index_resolver
